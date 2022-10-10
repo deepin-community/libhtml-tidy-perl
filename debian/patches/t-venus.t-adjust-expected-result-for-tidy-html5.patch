@@ -1,0 +1,58 @@
+From: Simon McVittie <smcv@debian.org>
+Date: Fri, 22 Jul 2016 09:34:53 +0100
+Subject: t/venus.t: adjust expected result for tidy-html5
+
+tidy-html5 allows arbitrary block content inside <address>, whereas
+traditional tidy only allowed inline content.
+Reference: <https://github.com/htacg/tidy-html5/issues/55>
+
+This change will break with traditional tidy, and it isn't clear
+to me how to remain compatible with both.
+
+Signed-off-by: Simon McVittie <smcv@debian.org>
+---
+ t/venus.t | 32 +++++++++++++++++++-------------
+ 1 file changed, 19 insertions(+), 13 deletions(-)
+
+diff --git a/t/venus.t b/t/venus.t
+index 41ee597..bd94d4b 100755
+--- a/t/venus.t
++++ b/t/venus.t
+@@ -72,18 +72,24 @@ __DATA__
+       <a href="../../General/Credits.html">Credits</a> | 
+       <a href="../../General/Feedback.html">Feedback</a> |</h4>
+     </center>
+-    <center>
+-      <p>
+-        <img src="../../WetlandGraphics/GoldbarThread.gif" width="648" height="4" align="bottom" />
+-      </p>
+-    </center>
+-    <div align="center"></div>
+-    <center>
+-      <address>Created for the Museums in the Classroom program sponsored by Illinois State Board of Education, the Brookfield Zoo, the Illinois State Museum., and Kildeer Countryside CCSD 96.</address>
+-      <address> </address>
+-      <address>Authors: Twin Groves Museums in the Classroom Team,</address>
+-      <address>School: Twin Groves Junior High School, Buffalo Grove, Illinois 60089</address>
+-    </center>
+-    <center>Created: 27 June 1998- Updated: 6 October 2003</center>
++    <address>
++      <center>
++        <p>
++          <img src="../../WetlandGraphics/GoldbarThread.gif" width="648" height="4" align="bottom" />
++        </p>
++      </center>
++      <div align="center"></div>
++      <address>
++        <center>
++          <address>Created for the Museums in the Classroom program sponsored by Illinois State Board of Education, the Brookfield Zoo, the Illinois State Museum., and Kildeer Countryside CCSD 96.</address>
++          <address> </address>
++          <address>Authors: Twin Groves Museums in the Classroom Team,</address>
++          <address>School: Twin Groves Junior High School, Buffalo Grove, Illinois 60089</address>
++        </center>
++      </address>
++      <address>
++        <center>Created: 27 June 1998- Updated: 6 October 2003</center>
++      </address>
++    </address>
+   </body>
+ </html>

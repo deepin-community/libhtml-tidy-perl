@@ -1,0 +1,45 @@
+Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
+Upstream-Name: HTML-Tidy
+Upstream-Contact: Andy Lester <andy@petdance.com>
+Source: https://metacpan.org/release/HTML-Tidy
+
+Files: *
+Copyright: 2005-2017, Andy Lester <andy@petdance.com>
+License: Artistic or GPL-1+
+
+Files: ppport.h
+Copyright: 2004-2009, Marcus Holland-Moritz <mhx-cpan@gmx.net>
+ 2001, Paul Marquess <pmqs@cpan.org> (Version 2.x)
+ 1999, Kenneth Albanowski <kjahds@kjahds.com> (Version 1.x)
+License: Artistic or GPL-1+
+
+Files: t/unicode.t
+Copyright: 2006 Jonathan Rockway <jrockway@cpan.org>
+License: Artistic or GPL-1+
+Comment: This file does not have an explicit license. According to
+ lib/HTML/Tidy.pm it is a contribution to the HTML-Tidy distribution,
+ therefore the same license as for the rest of the module is assumed.
+ Additionally putting code "under the same terms as Perl itself" is what the
+ author usually does for his Perl code.
+
+Files: debian/*
+Copyright: 2009, Ryan Niebur <ryanryan52@gmail.com>
+ 2010, Jonathan Yu <jawnsy@cpan.org>
+ 2013-2017, Florian Schlichting <fsfs@debian.org>
+License: Artistic or GPL-1+
+
+License: Artistic
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the Artistic License, which comes with Perl.
+ .
+ On Debian systems, the complete text of the Artistic License can be
+ found in `/usr/share/common-licenses/Artistic'.
+
+License: GPL-1+
+ This program is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 1, or (at your option)
+ any later version.
+ .
+ On Debian systems, the complete text of version 1 of the GNU General
+ Public License can be found in `/usr/share/common-licenses/GPL-1'.

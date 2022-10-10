@@ -1,0 +1,36 @@
+From: Simon McVittie <smcv@debian.org>
+Date: Fri, 22 Jul 2016 09:29:39 +0100
+Subject: t/unicode.t: don't assert that the DOCTYPE is preserved
+
+tidy-html5 currently doesn't preserve user-supplied DOCTYPEs
+in output: <https://github.com/htacg/tidy-html5/issues/435>
+
+Signed-off-by: Simon McVittie <smcv@debian.org>
+---
+ t/unicode.html | 2 +-
+ t/unicode.t    | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/t/unicode.html b/t/unicode.html
+index a90f83f..c8d1804 100644
+--- a/t/unicode.html
++++ b/t/unicode.html
+@@ -1,4 +1,4 @@
+-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
++<!DOCTYPE html>
+ <html>
+ <head>
+ <title>日本語のホムページ</title>
+diff --git a/t/unicode.t b/t/unicode.t
+index 9ca6370..679b48a 100644
+--- a/t/unicode.t
++++ b/t/unicode.t
+@@ -53,7 +53,7 @@ subtest 'Try send bytes to clean method.' => sub {
+ };
+ 
+ __DATA__
+-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
++<!DOCTYPE html>
+ <html>
+ <head>
+ <meta name="generator" content="Tidy">

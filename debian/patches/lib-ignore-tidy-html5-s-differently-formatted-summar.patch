@@ -1,0 +1,24 @@
+From: Simon McVittie <smcv@debian.org>
+Date: Fri, 22 Jul 2016 09:19:08 +0100
+Subject: lib: ignore tidy-html5's differently-formatted summary line
+
+Signed-off-by: Simon McVittie <smcv@debian.org>
+---
+ lib/HTML/Tidy.pm | 4 ++++
+ 1 file changed, 4 insertions(+)
+
+diff --git a/lib/HTML/Tidy.pm b/lib/HTML/Tidy.pm
+index e19a33d..e527f94 100644
+--- a/lib/HTML/Tidy.pm
++++ b/lib/HTML/Tidy.pm
+@@ -266,6 +266,10 @@ sub _parse_errors {
+             # Summary line we don't want
+ 
+         }
++        elsif ( $line =~ /^Tidy found \d+ warnings? and \d+ errors?!/ ) {
++            # Summary line we don't want
++
++        }
+         elsif ( $line eq 'No warnings or errors were found.' ) {
+             # Summary line we don't want
+ 

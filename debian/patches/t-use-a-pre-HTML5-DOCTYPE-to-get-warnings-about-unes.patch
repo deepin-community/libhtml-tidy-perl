@@ -1,0 +1,128 @@
+From: Simon McVittie <smcv@debian.org>
+Date: Fri, 22 Jul 2016 09:27:26 +0100
+Subject: t: use a pre-HTML5 DOCTYPE to get warnings about unescaped ampersand
+
+HTML5 defines an ampersand followed by whitespace to be unambiguously
+an ampersand, matching what browsers have always done in practice.
+As a result, tidy-html5 does not warn about them when the doctype
+is either HTML5 or missing (lack of a DOCTYPE is treated as HTML5,
+on the basis that HTML5 is a closer match for what browsers actually
+do than any previous standard). Discussion here:
+<https://github.com/htacg/tidy-html5/issues/207>
+
+Adding the DOCTYPE throws off some of the line numbering, which needs
+adjusting.
+
+t/ignore-text.t also seems to rely on the missing DOCTYPE provoking a
+warning, which is obviously not going to happen now that we've
+added one, to be able to verify that case-insensitive ignoring
+can work. Add a new error so we can ignore that instead.
+
+Signed-off-by: Simon McVittie <smcv@debian.org>
+---
+ t/ignore-text.t |  8 +++++---
+ t/ignore.t      | 10 +++++-----
+ t/levels.t      | 10 +++++-----
+ 3 files changed, 15 insertions(+), 13 deletions(-)
+
+diff --git a/t/ignore-text.t b/t/ignore-text.t
+index 9695a5a..a95e0e0 100644
+--- a/t/ignore-text.t
++++ b/t/ignore-text.t
+@@ -10,8 +10,8 @@ use HTML::Tidy;
+ my $html = do { local $/; <DATA> };
+ 
+ my @expected_messages = split /\n/, q{
+-DATA (24:XX) Warning: unescaped & which should be written as &amp;
+-DATA (24:XX) Warning: unescaped & which should be written as &amp;
++DATA (26:XX) Warning: unescaped & which should be written as &amp;
++DATA (26:XX) Warning: unescaped & which should be written as &amp;
+ };
+ 
+ chomp @expected_messages;
+@@ -22,7 +22,7 @@ IGNORE_BOGOTAG: {
+     isa_ok( $tidy, 'HTML::Tidy' );
+ 
+     $tidy->ignore( text => qr/bogotag/ );
+-    $tidy->ignore( text => [ qr/UNESCAPED/, qr/doctype/i ] );
++    $tidy->ignore( text => [ qr/UNESCAPED/, qr/case-insensitive/i ] );
+     # The qr/UNESCAPED/ should not ignore anything because there's no /i
+     my $rc = $tidy->parse( 'DATA', $html );
+     ok( $rc, 'Parsed OK' );
+@@ -44,6 +44,7 @@ sub munge_returned {
+     }
+ }
+ __DATA__
++<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+ <HTML>
+ <HEAD>
+ 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html;CHARSET=iso-8859-1">
+@@ -67,6 +68,7 @@ DIV.TOC P {
+ </HEAD>
+ <BODY BGCOLOR="white">
+ <BOGOTAG>
++<CASE-INSENSITIVE>
+     <IMG SRC="/pix/petdance-logo-400x312.gif" HEIGHT=312 WIDTH=400 ALT="Andy & Amy's Pet Supplies & Dance Instruction" ALIGN=RIGHT>
+ 	<DIV CLASS="TOC">
+ 	<h2>Perl, Programming &amp; Writing</h2>
+diff --git a/t/ignore.t b/t/ignore.t
+index 3991733..c0a1317 100644
+--- a/t/ignore.t
++++ b/t/ignore.t
+@@ -10,16 +10,15 @@ use HTML::Tidy;
+ my $html = do { local $/ = undef; <DATA> };
+ 
+ my @expected_warnings = split /\n/, q{
+-- (1:1) Warning: missing <!DOCTYPE> declaration
+-- (23:1) Warning: discarding unexpected <bogotag>
+-- (24:XX) Warning: unescaped & which should be written as &amp;
+-- (24:XX) Warning: unescaped & which should be written as &amp;
++- (24:1) Warning: discarding unexpected <bogotag>
++- (25:XX) Warning: unescaped & which should be written as &amp;
++- (25:XX) Warning: unescaped & which should be written as &amp;
+ };
+ chomp @expected_warnings;
+ shift @expected_warnings; # First one's blank
+ 
+ my @expected_errors = split /\n/, q{
+-- (23:1) Error: <bogotag> is not recognized!
++- (24:1) Error: <bogotag> is not recognized!
+ };
+ chomp @expected_errors;
+ shift @expected_errors; # First one's blank
+@@ -71,6 +70,7 @@ sub munge_returned {
+     }
+ }
+ __DATA__
++<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+ <HTML>
+ <HEAD>
+ 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html;CHARSET=iso-8859-1">
+diff --git a/t/levels.t b/t/levels.t
+index 01aeb3b..2ee3162 100644
+--- a/t/levels.t
++++ b/t/levels.t
+@@ -13,11 +13,10 @@ my $rc = $tidy->parse( '-', <DATA> );
+ ok( $rc, 'Parsed OK' );
+ 
+ my @expected = split /\n/, q{
+-- (1:1) Warning: missing <!DOCTYPE> declaration
+-- (23:1) Error: <bogotag> is not recognized!
+-- (23:1) Warning: discarding unexpected <bogotag>
+-- (24:XX) Warning: unescaped & which should be written as &amp;
+-- (24:XX) Warning: unescaped & which should be written as &amp;
++- (24:1) Error: <bogotag> is not recognized!
++- (24:1) Warning: discarding unexpected <bogotag>
++- (25:XX) Warning: unescaped & which should be written as &amp;
++- (25:XX) Warning: unescaped & which should be written as &amp;
+ };
+ chomp @expected;
+ shift @expected; # First one's blank
+@@ -41,6 +40,7 @@ sub munge_returned {
+ }
+ 
+ __DATA__
++<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
+ <HTML>
+ <HEAD>
+ 	<META HTTP-EQUIV="Content-Type" CONTENT="text/html;CHARSET=iso-8859-1">

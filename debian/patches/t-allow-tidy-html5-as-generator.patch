@@ -1,0 +1,47 @@
+From: Simon McVittie <smcv@debian.org>
+Date: Fri, 22 Jul 2016 09:21:39 +0100
+Subject: t: allow tidy-html5 as generator
+
+Signed-off-by: Simon McVittie <smcv@debian.org>
+---
+ t/roundtrip.t | 2 +-
+ t/unicode.t   | 6 ++----
+ 2 files changed, 3 insertions(+), 5 deletions(-)
+
+diff --git a/t/roundtrip.t b/t/roundtrip.t
+index e37cb88..2590795 100644
+--- a/t/roundtrip.t
++++ b/t/roundtrip.t
+@@ -25,7 +25,7 @@ my @messages = $tidy->messages( $clean );
+ 
+ is_deeply( \@messages, [], q{The cleaned stuff shouldn't have any errors} );
+ 
+-$clean =~ s/"(HTML Tidy|tidyp).+w3\.org"/"Tidy"/;
++$clean =~ s/"((HTML Tidy|tidyp).+w3\.org|HTML Tidy for HTML5[^"]+)"/"Tidy"/;
+ 
+ my $expected = do { local $/ = undef; <DATA> };
+ is( $clean, $expected, 'Cleaned up properly' );
+diff --git a/t/unicode.t b/t/unicode.t
+index 2f45384..9ca6370 100644
+--- a/t/unicode.t
++++ b/t/unicode.t
+@@ -30,8 +30,7 @@ ok(utf8::is_utf8($reference), 'reference is utf8');
+ my $clean = $tidy->clean( $html );
+ ok(utf8::is_utf8($clean), 'cleaned output is also unicode');
+ 
+-$clean =~ s/"HTML Tidy.+w3\.org"/"Tidy"/;
+-$clean =~ s/"(HTML Tidy|tidyp).+w3\.org"/"Tidy"/;
++$clean =~ s/"((HTML Tidy|tidyp).+w3\.org|HTML Tidy for HTML5[^"]*)"/"Tidy"/;
+ is($clean, $reference, q{Cleanup didn't break anything});
+ 
+ my @messages = $tidy->messages;
+@@ -49,8 +48,7 @@ subtest 'Try send bytes to clean method.' => sub {
+     ok(!utf8::is_utf8($html), 'html is row bytes');
+     my $clean = $tidy->clean( $html );
+     ok(utf8::is_utf8($clean), 'but cleaned output is string');
+-    $clean =~ s/"HTML Tidy.+w3\.org"/"Tidy"/;
+-    $clean =~ s/"(HTML Tidy|tidyp).+w3\.org"/"Tidy"/;
++    $clean =~ s/"((HTML Tidy|tidyp).+w3\.org|HTML Tidy for HTML5[^"]*)"/"Tidy"/;
+     is($clean, $reference, q{Cleanup didn't break anything});
+ };
+ 

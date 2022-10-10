@@ -1,0 +1,59 @@
+From: Simon McVittie <smcv@debian.org>
+Date: Fri, 22 Jul 2016 09:32:09 +0100
+Subject: t: don't assert that tidy will add a HTML 3.2 doctype
+
+tidy-html5 adds the HTML5 doctype, <!DOCTYPE html>.
+
+Signed-off-by: Simon McVittie <smcv@debian.org>
+---
+ t/roundtrip.t | 3 ++-
+ t/wordwrap.t  | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
+
+--- a/t/roundtrip.t
++++ b/t/roundtrip.t
+@@ -26,12 +26,13 @@
+ is_deeply( \@messages, [], q{The cleaned stuff shouldn't have any errors} );
+ 
+ $clean =~ s/"((HTML Tidy|tidyp).+w3\.org|HTML Tidy for HTML5[^"]+)"/"Tidy"/;
++$clean =~ s/<!DOCTYPE html[^>]*>/<!DOCTYPE html>/;
+ 
+ my $expected = do { local $/ = undef; <DATA> };
+ is( $clean, $expected, 'Cleaned up properly' );
+ 
+ __DATA__
+-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
++<!DOCTYPE html>
+ <html>
+ <head>
+ <meta name="generator" content="Tidy">
+--- a/t/wordwrap.t
++++ b/t/wordwrap.t
+@@ -11,7 +11,7 @@
+ 
+ my $expected=<<'EOD';
+ <!DOCTYPE 
+-html PUBLIC "-//W3C//DTD HTML 3.2//EN">
++html>
+ <html>
+ <head>
+ <title>
+@@ -32,6 +32,7 @@
+ my $tidy = HTML::Tidy->new( {config_file => $cfg} );
+ 
+ my $result = $tidy->clean( $input );
++$result =~ s/<!DOCTYPE ?\nhtml[^>]*>/<!DOCTYPE \nhtml>/;
+ my @result = split(/\n/, $result);
+ is_deeply( \@result, \@expected, 'Cleaned stuff looks like what we expected');
+ 
+--- a/t/clean.t
++++ b/t/clean.t
+@@ -24,7 +24,7 @@
+ );
+ 
+ sub _expected_empty_html {
+-    return qr{<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 3.2//EN">
++    return qr{<!DOCTYPE html>
+ <html>
+ <head>
+ <meta name="generator" content="[^"]+">

@@ -1,0 +1,22 @@
+From: Ryan Niebur <ryan@debian.org>
+Date: Tue, 2 Jun 2009 21:15:36 -0700
+Subject: make webtidy error message more debianish
+
+Forwarded: not-needed
+---
+ bin/webtidy | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/bin/webtidy b/bin/webtidy
+index dc1a979..5338d09 100755
+--- a/bin/webtidy
++++ b/bin/webtidy
+@@ -29,7 +29,7 @@ for my $url ( @ARGV ) {
+     my @lines;
+     if ( $url =~ /^https?:/ ) {
+         if ( !eval { require LWP::Simple; 1; } ) {
+-            warn q{Can't retrieve URLs without LWP::Simple installed};
++            warn q{Can't retrieve URLs without the libwww-perl package installed};
+             next;
+         }
+ 

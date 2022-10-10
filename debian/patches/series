@@ -1,0 +1,9 @@
+tidy-not-tidyp.patch
+lib-ignore-tidy-html5-s-differently-formatted-summar.patch
+t-allow-tidy-html5-as-generator.patch
+t-use-a-pre-HTML5-DOCTYPE-to-get-warnings-about-unes.patch
+t-unicode.t-don-t-assert-that-the-DOCTYPE-is-preserv.patch
+t-don-t-assert-that-tidy-will-add-a-HTML-3.2-doctype.patch
+t-venus.t-adjust-expected-result-for-tidy-html5.patch
+fix-error-message-in-webtidy
+tests-tidy-html5-5.6.patch

@@ -1,0 +1,104 @@
+From: Simon McVittie <smcv@debian.org>
+Date: Fri, 22 Jul 2016 10:33:50 +0100
+Subject: Look for tidy if tidyp is not found
+
+tidy-html5 is an actively-maintained, HTML5-supporting variant of
+the tidy library from which tidyp was forked.
+
+Based on Debian-specific patches by Florian Schlichting and
+gregor herrmann, which unconditionally switched from tidyp to tidy.
+---
+ Makefile.PL      |  6 ++++++
+ Tidy.xs          | 15 +++++++++++++--
+ lib/HTML/Tidy.pm |  7 +++++++
+ t/version.t      |  2 +-
+ 4 files changed, 27 insertions(+), 3 deletions(-)
+
+diff --git a/Makefile.PL b/Makefile.PL
+index 1bca2ef..e3f64a0 100644
+--- a/Makefile.PL
++++ b/Makefile.PL
+@@ -25,6 +25,12 @@ else {
+     $libs = $vars[2];
+ 
+     if ( !$libs ) {
++        @vars = ExtUtils::Liblist->ext( '-L/usr/lib -L/usr/local/lib -ltidy', 0, 1 );
++        $libs = $vars[2];
++        $inc = "-I. -I/usr/include/tidy -I/usr/local/include/tidy -I$Config{usrinc}/tidy -DWITH_TIDY";
++    }
++
++    if ( !$libs ) {
+         $libs = '-ltidyp';
+         print <<'EOF';
+ 
+diff --git a/Tidy.xs b/Tidy.xs
+index 2238b0b..0b86116 100644
+--- a/Tidy.xs
++++ b/Tidy.xs
+@@ -2,8 +2,14 @@
+ #include "perl.h"
+ #include "XSUB.h"
+ 
+-#include <tidyp.h>
+-#include <buffio.h>
++#ifdef WITH_TIDY
++# include <tidy.h>
++# include <tidybuffio.h>
++#else
++# include <tidyp.h>
++# include <buffio.h>
++#endif
++
+ #include <stdio.h>
+ #include <errno.h>
+ 
+@@ -196,7 +202,12 @@ _tidyp_version()
+     PREINIT:
+         const char* version;
+     CODE:
++#ifdef WITH_TIDY
++        /* tidy-html5 is required */
++        version = tidyLibraryVersion();
++#else
+         version = tidyVersion();
++#endif
+         RETVAL = newSVpv(version,0); /* will be automatically "mortalized" */
+     OUTPUT:
+         RETVAL
+diff --git a/lib/HTML/Tidy.pm b/lib/HTML/Tidy.pm
+index 32a5005..e19a33d 100644
+--- a/lib/HTML/Tidy.pm
++++ b/lib/HTML/Tidy.pm
+@@ -4,6 +4,7 @@ use 5.008;
+ use strict;
+ use warnings;
+ use Carp ();
++use version 0.77 ();
+ 
+ use HTML::Tidy::Message;
+ 
+@@ -355,6 +356,12 @@ sub libtidyp_version { return shift->tidyp_version }
+ sub tidyp_version {
+     my $version_str = _tidyp_version();
+ 
++    # Convert tidy-html5 versions to the 5.002001 form so they work
++    # with naive numeric comparison
++    if ($version_str !~ m/^0\./) {
++        $version_str = version->parse("v$version_str")->numify;
++    }
++
+     return $version_str;
+ }
+ 
+diff --git a/t/version.t b/t/version.t
+index f225e3e..c2528cd 100644
+--- a/t/version.t
++++ b/t/version.t
+@@ -8,6 +8,6 @@ use Test::More tests => 4;
+ use HTML::Tidy;
+ 
+ for my $version_string (HTML::Tidy->tidyp_version, HTML::Tidy->libtidyp_version) {
+-    like( $version_string, qr/^\d\.\d{2,}$/, 'Valid version string' );
++    like( $version_string, qr/^\d\.\d+$/, 'Valid version string' );
+     cmp_ok( $version_string, '>=', '0.90', 'Version is greater than 0.90, which is the one I maintain' );
+ }
